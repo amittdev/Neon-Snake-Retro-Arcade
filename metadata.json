@@ -1,0 +1,6 @@
+{
+  "name": "Neon Snake Retro Arcade",
+  "description": "A complete, modern, polished Snake Game built with pure HTML, CSS, and vanilla JavaScript, ready for Vercel deployment.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

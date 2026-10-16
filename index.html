@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Neon Snake Retro Arcade</title>
+  <meta name="description" content="A complete, modern, polished Snake Game built with pure HTML, CSS, and vanilla JavaScript." />
+  <meta property="og:title" content="Neon Snake Retro Arcade" />
+  <meta property="og:description" content="A complete, modern, polished Snake Game built with pure HTML, CSS, and vanilla JavaScript." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body data-state="title">
+  <div class="game-wrapper">
+    <!-- Header / HUD -->
+    <header class="game-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" class="svg-icon" aria-hidden="true">
+            <path d="M4 12c0-4.4 3.6-8 8-8s8 3.6 8 8-3.6 8-8 8H4v-4h8c2.2 0 4-1.8 4-4s-1.8-4-4-4-4 1.8-4 4v4H4z" fill="currentColor"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1 class="game-title">NEON SNAKE</h1>
+          <span class="game-subtitle">ARCADE EDITION</span>
+        </div>
+      </div>
+
+      <div class="hud-stats">
+        <div class="stat-badge score-badge">
+          <span class="stat-label">SCORE</span>
+          <span class="stat-value" id="score-display">0</span>
+        </div>
+        <div class="stat-badge best-badge">
+          <span class="stat-label">BEST</span>
+          <span class="stat-value" id="best-display">0</span>
+        </div>
+        <div class="stat-badge speed-badge">
+          <span class="stat-label">LEVEL</span>
+          <span class="stat-value" id="level-display">1</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="sound-btn" class="icon-btn" aria-label="Toggle sound" title="Toggle sound">
+          <svg id="sound-icon-on" viewBox="0 0 24 24" class="svg-icon" aria-hidden="true">
+            <path d="M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <svg id="sound-icon-off" viewBox="0 0 24 24" class="svg-icon hidden" aria-hidden="true">
+            <path d="M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+        <button id="fullscreen-btn" class="icon-btn" aria-label="Toggle fullscreen" title="Toggle Fullscreen (F)">
+          <svg id="fullscreen-icon-enter" viewBox="0 0 24 24" class="svg-icon" aria-hidden="true">
+            <path d="M4 8V4h4M20 8V4h-4M4 16v4h4M20 16v4h-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <svg id="fullscreen-icon-exit" viewBox="0 0 24 24" class="svg-icon hidden" aria-hidden="true">
+            <path d="M8 4v4H4M16 4v4h4M8 20v-4H4M16 20v-4h4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+        <button id="pause-btn" class="icon-btn" aria-label="Pause game" title="Pause (Space)">
+          <svg id="pause-icon" viewBox="0 0 24 24" class="svg-icon" aria-hidden="true">
+            <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" fill="currentColor"/>
+          </svg>
+          <svg id="resume-icon" viewBox="0 0 24 24" class="svg-icon hidden" aria-hidden="true">
+            <path d="M8 5v14l11-7z" fill="currentColor"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Game Playfield -->
+    <main class="game-stage">
+      <div class="canvas-container" id="canvas-container">
+        <canvas id="game-canvas" width="400" height="400" aria-label="Snake Game Board"></canvas>
+
+        <!-- Start Overlay -->
+        <div id="start-overlay" class="overlay active">
+          <div class="overlay-card">
+            <div class="overlay-badge">RETRO ARCADE</div>
+            <h2 class="overlay-title">SNAKE</h2>
+            <p class="overlay-desc">Control the neon serpent. Hunt glowing prey. Grow longer and survive the grid.</p>
+            <div class="overlay-keys-hint">
+              <span class="key-pill">W A S D</span>
+              <span class="hint-sep">or</span>
+              <span class="key-pill">ARROWS</span>
+              <span class="hint-sep">·</span>
+              <span class="key-pill">SPACE</span> to pause
+            </div>
+            <button id="start-btn" class="action-btn primary-btn" data-start="true">
+              <span>START GAME</span>
+              <svg viewBox="0 0 24 24" class="btn-arrow" aria-hidden="true">
+                <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Pause Overlay -->
+        <div id="pause-overlay" class="overlay hidden">
+          <div class="overlay-card">
+            <div class="overlay-badge pause-badge">PAUSED</div>
+            <h2 class="overlay-title">GAME PAUSED</h2>
+            <div class="mini-stats">
+              <div class="mini-stat-item">
+                <span class="mini-label">CURRENT SCORE</span>
+                <span class="mini-val" id="pause-score">0</span>
+              </div>
+              <div class="mini-stat-item">
+                <span class="mini-label">SNAKE LENGTH</span>
+                <span class="mini-val" id="pause-length">3</span>
+              </div>
+            </div>
+            <div class="overlay-btn-group">
+              <button id="resume-btn" class="action-btn primary-btn">
+                <span>RESUME</span>
+              </button>
+              <button id="pause-restart-btn" class="action-btn secondary-btn">
+                <span>RESTART</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Game Over Overlay -->
+        <div id="gameover-overlay" class="overlay hidden">
+          <div class="overlay-card">
+            <div class="overlay-badge gameover-badge">GAME OVER</div>
+            <h2 class="overlay-title">CRASH!</h2>
+            <div id="new-high-score-banner" class="high-score-banner hidden">
+              ★ NEW HIGH SCORE! ★
+            </div>
+            <div class="score-summary-grid">
+              <div class="summary-cell">
+                <span class="summary-label">FINAL SCORE</span>
+                <span class="summary-num" id="final-score">0</span>
+              </div>
+              <div class="summary-cell">
+                <span class="summary-label">BEST RECORD</span>
+                <span class="summary-num" id="final-best">0</span>
+              </div>
+              <div class="summary-cell">
+                <span class="summary-label">FOOD EATEN</span>
+                <span class="summary-num" id="final-food">0</span>
+              </div>
+              <div class="summary-cell">
+                <span class="summary-label">LENGTH</span>
+                <span class="summary-num" id="final-length">3</span>
+              </div>
+            </div>
+            <button id="restart-btn" class="action-btn primary-btn" data-start="true">
+              <span>PLAY AGAIN</span>
+              <svg viewBox="0 0 24 24" class="btn-arrow" aria-hidden="true">
+                <path d="M1 4v6h6M23 20v-6h-6" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Mobile Touch D-Pad Controls -->
+    <section class="touch-controls" id="touch-controls" aria-label="Directional Controls">
+      <div class="dpad-cluster">
+        <button id="btn-up" class="dpad-btn dpad-up" aria-label="Move Up">
+          <svg viewBox="0 0 24 24" class="svg-icon" aria-hidden="true">
+            <path d="M12 5l-7 7h14l-7-7z" fill="currentColor"/>
+          </svg>
+        </button>
+        <div class="dpad-horizontal">
+          <button id="btn-left" class="dpad-btn dpad-left" aria-label="Move Left">
+            <svg viewBox="0 0 24 24" class="svg-icon" aria-hidden="true">
+              <path d="M5 12l7-7v14l-7-7z" fill="currentColor"/>
+            </svg>
+          </button>
+          <div class="dpad-center" aria-hidden="true"></div>
+          <button id="btn-right" class="dpad-btn dpad-right" aria-label="Move Right">
+            <svg viewBox="0 0 24 24" class="svg-icon" aria-hidden="true">
+              <path d="M19 12l-7-7v14l7-7z" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
+        <button id="btn-down" class="dpad-btn dpad-down" aria-label="Move Down">
+          <svg viewBox="0 0 24 24" class="svg-icon" aria-hidden="true">
+            <path d="M12 19l-7-7h14l-7 7z" fill="currentColor"/>
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- Instructions / Footer -->
+    <footer class="game-footer">
+      <div class="control-hints desktop-hints">
+        <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or <kbd>↑</kbd><kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd> Move</span>
+        <span class="sep">·</span>
+        <span><kbd>Space</kbd> Pause</span>
+        <span class="sep">·</span>
+        <span><kbd>Enter</kbd> Start / Restart</span>
+        <span class="sep">·</span>
+        <span><kbd>F</kbd> Fullscreen</span>
+      </div>
+      <div class="control-hints mobile-hints">
+        <span>Use on-screen buttons or swipe the board to direct the snake</span>
+      </div>
+    </footer>
+  </div>
+
+  <script src="./script.js"></script>
+</body>
+</html>
